@@ -327,7 +327,6 @@ CustomSkinsTab = "Custom skins"
 CustomSkinsTip = "Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running."
 CustomSkinTutorial = """
 Custom skin allows to change player skins without replacing any existing game ped skins.
-
 Steps to enable 'Custom Skins',
 
 1. Download & install modloader
@@ -342,6 +341,10 @@ Limitations:
 3. Do NOT name your files to existing ped names
 
 Doing so will crash your game."""
+TestFeatures = "Test Features"
+Explosion = "Create an Explosion at your coordinates"
+IsFlying = "Flying check"
+
 CycleJump = "Higher cycle jumps"
 DownloadModloader = "Download modloader"
 DrunkEffect = "Drunk effect"
@@ -398,6 +401,12 @@ TopDownCamera = "Top-down camera"
 TotalSkins = "Total skins: "
 WantedLevel = "Wanted level"
 WorkSkinOnly = "Only contains the skins that work"
+
+[Test]
+TestingTab = "Test Tab"
+TestFeatures = "Test Features"
+TestVehicle = "Vehicle"
+Explosion = "Explosion"
 
 [RPC]
 BrowsingCheatMenu = "Browsing CheatMenu"
@@ -849,3 +858,4 @@ TeleportPage = "Teleport"
 VehiclePage = "Vehicle"
 VisualPage = "Visual"
 WeaponPage = "Weapon"
+TestPage = "Test"

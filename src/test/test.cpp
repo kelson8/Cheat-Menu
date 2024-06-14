@@ -339,9 +339,8 @@ void TestPage::Draw()
 
             ImGui::Text("Test Items");
             //CWorld::
-            ImGui::EndTabItem();
-            ImGui::EndTabItem();
             */
+            ImGui::EndTabItem();
         }
 
     //ImGui::EndChild();
