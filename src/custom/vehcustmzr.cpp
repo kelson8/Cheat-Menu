@@ -265,22 +265,22 @@ VehCustmzrMgr::VehCustmzrMgr()
 
                 if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
                 {
-                    chance = Random(1, 20);
+                    chance = Random(uint(1), uint(20));
                 }
 
                 if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
                 {
-                    chance = Random(1, 4);
+                    chance = Random(uint(1), uint(4));
                 }
 
                 if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
                 {
-                    chance = Random(1, 3);
+                    chance = Random(uint(1), uint(3));
                 }
 
                 if (chance == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
                 {
-                    Neon.Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
+                    Neon.Install(veh, Random(uint(0), uint(255)), Random(uint(0), uint(255)), Random(uint(0), uint(255)));
                 }
             }
             m_Neon.m_nTrafficTimer = timer;

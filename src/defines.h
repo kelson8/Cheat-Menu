@@ -9,8 +9,10 @@
 
 #define MENU_NAME "Cheat Menu"
 #define MENU_VERSION_NUMBER "3.52"
+
 #define MENU_VERSION MENU_VERSION_NUMBER
 #define MENU_TITLE MENU_NAME " v" MENU_VERSION
+#define CUSTOM_CODE
 
 #ifdef GTASA
 #define BY_GAME(sa, vc, iii) sa

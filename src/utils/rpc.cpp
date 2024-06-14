@@ -74,7 +74,8 @@ void RPC::Process()
     }
 
     static std::string detailsText, stateText, smallImg, smallImgText, largeImg, largeImgText;
-    static size_t curImage = Random(1, 5);
+    /*static size_t curImage = Random(1, 5);*/
+    static size_t curImage = Random(float (1), float (5));
     static size_t timer = CTimer::m_snTimeInMilliseconds;
     
     CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];

@@ -3,6 +3,8 @@
 #include <fstream>
 #include <memory>
 
+//#define _TEST
+
 enum class eLogLevel
 {
     Debug,
@@ -46,7 +48,12 @@ public:
 #endif
         }
         AppendLogLevel(fmt);
+
+#define _TEST
+#ifndef _TEST
         *pLog << std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...)) << std::endl;
+#endif //_TEST
+#undef _TEST
     }
 
     template <eLogLevel T>

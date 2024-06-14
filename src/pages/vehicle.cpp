@@ -172,7 +172,7 @@ int VehiclePage::GetRandomTrainIdForModel(int model)
         Util::SetMessage("Invalid train model");
         return -1;
     }
-    int id = Random(_start, _end);
+    int id = Random(uint(_start), uint(_end));
     return train_ids[id];
 }
 #elif GTAVC
@@ -317,9 +317,9 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
         
         CTrain* pTrain = nullptr;
         CTrain* carraige = nullptr;
-        int track = Random(0, 1);
+        int track = Random(uint(0), uint(1));
         int node = CTrain::FindClosestTrackNode(pos, &track);
-        CTrain::CreateMissionTrain(pos, (Random(0, 1)) == 1 ? true : false, trainID, &pTrain, &carraige, node, track, false);
+        CTrain::CreateMissionTrain(pos, (Random(uint(0), uint(1))) == 1 ? true : false, trainID, &pTrain, &carraige, node, track, false);
 
         pVeh = (CVehicle*)pTrain;
         hVeh = CPools::GetVehicleRef(pVeh);
@@ -374,7 +374,7 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
         {
             for (int i = 0; i < 20; ++i)
             {
-                unsigned int compID = Random(1000, 1093);
+                unsigned int compID = Random(uint(1000), uint(1093));
 
                 if (VehCustmzr.IsSideskirtComponent(compID))
                 {

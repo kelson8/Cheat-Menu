@@ -10,6 +10,10 @@
 #include "custom/topdowncam_sa.h"
 #include "custom/customskins_sa.h"
 
+#ifdef CUSTOM_CODE
+#include "CExplosion.h"
+#endif
+
 static inline const char* clothNameList[18] =
 {
     "Shirts", "Heads", "Trousers", "Shoes", "Tattoos left lower arm", "Tattoos left upper arm",
@@ -784,7 +788,24 @@ void PlayerPage::Draw()
 
                 ImGui::Spacing();
                 ImGui::Separator();
+
+#ifdef CUSTOM_CODE
+
+                if (ImGui::CollapsingHeader(TEXT("Player.TestFeatures"))) {
+                    if (ImGui::Button(TEXT("Player.Explosion"), Widget::CalcSize(3))) {
+                        //CExplosion* explosion = new CExplosion();
+                        //CPlayerPed playerPed = FindPlayerPed();
+                        CVector playerCoords = FindPlayerCoors(-1);
+                        
+                        CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, playerCoords, 1000, true, 1.0f, true);
+                    }
+                }
+
+                ImGui::Spacing();
+                ImGui::Separator();
+#endif //CUSTOM_CODE
             }
+
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
@@ -863,5 +884,44 @@ void PlayerPage::Draw()
         }
 #endif
         ImGui::EndTabBar();
+
+
     }
+
+#ifdef CUSTOM_CODE
+    
+    ImGui::Spacing();
+    if (ImGui::BeginTabBar("TestTab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
+        if (ImGui::BeginTabItem(TEXT("TestTab.TestTab"))) {
+
+            ImGui::Text("Hello from KCNet");
+
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            // I never did get this working yet.
+            if (ImGui::CollapsingHeader(TEXT("Player.TestFeatures"))) {
+                if (ImGui::Button(TEXT("Player.Explosion"), Widget::CalcSize(3))) {
+                    //CExplosion* explosion = new CExplosion();
+                    //CPlayerPed playerPed = FindPlayerPed();
+                    
+                    // This somewhat works but has no sound
+                    CVector testCoords = CVector(2494.666016, -1672.507080, 13.335972);
+                    // From teleport.cpp
+                    // Couldn't get this working properly.
+                    CPlayerPed* pPlayer = FindPlayerPed();
+
+                    CVector playerCoords = pPlayer->GetPosition();
+                    //
+
+                    CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, testCoords, 1000, true, 1.0f, true);
+                }
+            }
+
+            ImGui::EndTabItem();
+
+        }
+        ImGui::EndTabBar();
+    }
+#endif //CUSTOM_CODE
 }

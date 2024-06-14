@@ -10,7 +10,7 @@ void RandomCheatsMgr::DrawPages()
 
     if ((timer - m_nTimer) > (static_cast<uint>(m_nInterval) * 1000))
     {
-        int id = Random(0, 91);
+        int id = Random(uint(0), uint(91));
 
         for (int i = 0; i < 92; i++)
         {

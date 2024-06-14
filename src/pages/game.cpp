@@ -43,13 +43,22 @@ GamePage& gamePage = GamePage::Get();
 GamePage::GamePage()
  : IPage<GamePage>(ePageID::Game, "Window.GamePage", true)
 {
+
+#define _TEST
 #ifdef GTASA
 
     Events::drawMenuBackgroundEvent += []()
     {
         if (bSaveGameFlag)
         {
+            
+            // I don't think this'll work.
+#ifdef _TEST
+            //FrontEndMenuManager.m_nCurrentMenuPage = MENUPAGE_SAVE_WRITE_ASK;
+#else
             FrontEndMenuManager.m_nCurrentMenuPage = MENUPAGE_GAME_SAVE;
+#endif
+            
             bSaveGameFlag = false;
         }
     };
@@ -178,14 +187,18 @@ void GamePage::Draw()
     CPlayerPed* pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);
 
+#ifdef _DISABLED_CODE
 #ifdef GTASA
     if (ImGui::Button(TEXT("Game.SaveGame"), Widget::CalcSize()))
     {
+
         FrontEndMenuManager.m_bActivateMenuNextFrame = true;
         bSaveGameFlag = true;
+
     }
     ImGui::Spacing();
-#endif
+#endif // GTASA
+#endif //_DISABLED_CODE
 
     if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
