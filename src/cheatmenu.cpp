@@ -9,6 +9,10 @@
 #include "pages/teleport.h"
 #include "pages/menu.h"
 
+// 6-14-2024 @ 11:34AM - kelson8
+// I setup this for building the asi:
+// https://stackoverflow.com/questions/1776060/how-to-make-visual-studio-copy-a-dll-file-to-the-output-directory
+
 static bool DrawTitleBar()
 {
     bool hovered, held;

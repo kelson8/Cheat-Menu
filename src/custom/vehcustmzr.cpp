@@ -102,6 +102,8 @@ bool VehCustmzrMgr::IsSideskirtComponent(unsigned int compID)
 
 void VehCustmzrMgr::ApplyCustomizations(std::string& cat, std::string& key, std::string& val)
 {
+    // These are neat, the BY_GAME defines seem to have everything in this order: SA, VC, 3.
+    // This is under defines.h
     CVehicle *pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
     if (pVeh)
     {

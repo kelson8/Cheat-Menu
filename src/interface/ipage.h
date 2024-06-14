@@ -15,7 +15,7 @@ enum class ePageID
     Menu, 
 
     // Added by kelson8
-    //Test,
+    Test,
 
     // Pages without headers
     Anniversary, 

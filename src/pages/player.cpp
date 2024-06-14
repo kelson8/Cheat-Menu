@@ -789,22 +789,45 @@ void PlayerPage::Draw()
                 ImGui::Spacing();
                 ImGui::Separator();
 
+            }
+            // Why doesn't the below menu show up?
+            // Oops I had this setup under the watned level menu, no wonder it didn't show up.
 #ifdef CUSTOM_CODE
 
-                if (ImGui::CollapsingHeader(TEXT("Player.TestFeatures"))) {
-                    if (ImGui::Button(TEXT("Player.Explosion"), Widget::CalcSize(3))) {
-                        //CExplosion* explosion = new CExplosion();
-                        //CPlayerPed playerPed = FindPlayerPed();
-                        CVector playerCoords = FindPlayerCoors(-1);
-                        
-                        CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, playerCoords, 1000, true, 1.0f, true);
-                    }
-                }
+            if (ImGui::CollapsingHeader(TEXT("Player.TestFeatures"))) {
+#ifdef GTASA
+                if (ImGui::Button(TEXT("Player.Explosion"), Widget::CalcSize(3))) {
+                    //CExplosion* explosion = new CExplosion();
+                    //CPlayerPed playerPed = FindPlayerPed();
+                    CVector playerCoords = FindPlayerCoors(-1);
 
+                    CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, playerCoords, 1000, true, 1.0f, true);
+                }
                 ImGui::Spacing();
                 ImGui::Separator();
-#endif //CUSTOM_CODE
+#endif //GTASA
+                ImGui::Text("Flying: ");
+                if (ImGui::Button(TEXT("Player.IsFlying")))
+                {
+                    // I've never used these much in C++
+                    // Ternary operators: https://cplusplus.com/forum/articles/14631/
+                    bool isFlying = Command<Commands::IS_CHAR_IN_FLYING_VEHICLE>(hplayer);
+                    // Will this work?
+                    //std::string flyingCheck = isFlying ? "Yes" : "No";
+                    // This doesn't show up properly
+                    const char* flyingCheck = isFlying ? "Yes" : "No";
+
+                    Util::SetMessage("In a flying vehicle: " + *flyingCheck);
+
+                    ImGui::Spacing();
+                    ImGui::Separator();
+
+                }
             }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+#endif //CUSTOM_CODE
 
             ImGui::EndChild();
             ImGui::EndTabItem();
@@ -885,43 +908,45 @@ void PlayerPage::Draw()
 #endif
         ImGui::EndTabBar();
 
-
-    }
-
 #ifdef CUSTOM_CODE
-    
-    ImGui::Spacing();
-    if (ImGui::BeginTabBar("TestTab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
-        if (ImGui::BeginTabItem(TEXT("TestTab.TestTab"))) {
 
-            ImGui::Text("Hello from KCNet");
+        ImGui::Spacing();
+        if (ImGui::BeginTabBar("TestTab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
+            if (ImGui::BeginTabItem(TEXT("TestTab.TestingTab"))) {
 
-            ImGui::Spacing();
-            ImGui::Separator();
+                ImGui::Text("Hello from KCNet");
 
-            // I never did get this working yet.
-            if (ImGui::CollapsingHeader(TEXT("Player.TestFeatures"))) {
-                if (ImGui::Button(TEXT("Player.Explosion"), Widget::CalcSize(3))) {
-                    //CExplosion* explosion = new CExplosion();
-                    //CPlayerPed playerPed = FindPlayerPed();
-                    
-                    // This somewhat works but has no sound
-                    CVector testCoords = CVector(2494.666016, -1672.507080, 13.335972);
-                    // From teleport.cpp
-                    // Couldn't get this working properly.
-                    CPlayerPed* pPlayer = FindPlayerPed();
+                ImGui::Spacing();
+                ImGui::Separator();
 
-                    CVector playerCoords = pPlayer->GetPosition();
-                    //
+                // I never did get this working yet.
+                if (ImGui::CollapsingHeader(TEXT("Player.TestFeatures"))) {
+#ifdef GTASA
+                    if (ImGui::Button(TEXT("Player.Explosion"), Widget::CalcSize(3))) {
+                        //CExplosion* explosion = new CExplosion();
+                        //CPlayerPed playerPed = FindPlayerPed();
 
-                    CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, testCoords, 1000, true, 1.0f, true);
+                        // This somewhat works but has no sound
+                        CVector testCoords = CVector(2494.666016, -1672.507080, 13.335972);
+                        // From teleport.cpp
+                        // Couldn't get this working properly.
+                        CPlayerPed* pPlayer = FindPlayerPed();
+
+                        CVector playerCoords = pPlayer->GetPosition();
+                        //
+
+                        //CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, testCoords, 1000, true, 1.0f, true);
+                        CExplosion::AddExplosion(NULL, NULL, EXPLOSION_CAR, testCoords, 1000, true, 1.0f, true);
+                    }
+#endif //GTASA
                 }
+
+                ImGui::EndTabItem();
+
             }
-
-            ImGui::EndTabItem();
-
+            ImGui::EndTabBar();
         }
-        ImGui::EndTabBar();
-    }
 #endif //CUSTOM_CODE
+    }
+
 }
