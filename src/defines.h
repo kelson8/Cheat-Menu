@@ -12,6 +12,8 @@
 
 #define MENU_VERSION MENU_VERSION_NUMBER
 #define MENU_TITLE MENU_NAME " v" MENU_VERSION
+
+// Add my custom code to the menu.
 #define CUSTOM_CODE
 
 #ifdef GTASA

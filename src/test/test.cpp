@@ -18,6 +18,10 @@
     https://github.com/user-grinch/Cheat-Menu
 */
 
+
+// Well this was working with the Visual Studio 2022 debugger now it says cannot find gta_sa.exe or gta-vc.exe.
+// It still seems to work if I launch the games directly though.
+
 #ifdef GTASA
 #include "CExplosion.h"
 // New
@@ -29,10 +33,20 @@
 #include "CCarAI.h"
 #include "CCarCtrl.h"
 #include "CCarEnterExit.h"
+#include "CHeli.h"
 
 //Misc
 #include "CCheat.h"
+#include "CCoronas.h"
+#include "CPickup.h"
+#include "CPickups.h"
+#include "CWeather.h"
+#include "CCheckpoints.h"
+#include "CGarages.h"
 
+//Test
+#include "CGame.h"
+#include "CWaterLevel.h"
 #endif
 
 #define _TEST
@@ -47,8 +61,15 @@
 #include "utils/util.h"
 #include "pages/ped.h"
 
+// My code
+#include "test_vehicle.h"
+#include "test_hud.h"
+#include "test_ped.h"
+
 // Well I had this working but then broke it 6-14-2024 @ 3:51PM...
 // I fixed it 3:53PM.
+
+// TODO Fix this to use translations from the English.toml file instead of hardcoding the values.
 
 TestPage& testPage = TestPage::Get();
 TestPage::TestPage()
@@ -56,42 +77,7 @@ TestPage::TestPage()
 
 }
 
-//void TestPage::VehicleTest() {
-//    // These are neat, the BY_GAME defines seem to have everything in this order: SA, VC, 3.
-//    // This is under defines.h
-//    CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
-//    int hVeh = CPools::GetVehicleRef(pVeh);
-//
-//    // If the player is in a vehicle.
-//    if (pVeh)
-//    {
-//
-//    }
-//
-//    // There is a lot of these on the sanny builder website.
-//    // 
-//    // Car, TireId (int)
-//    // https://library.sannybuilder.com/#/sa/default/04FE
-//    //Command<Commands::BURST_CAR_TYRE>(hVeh, 1);
-//
-//    // Get car speed
-//    // https://library.sannybuilder.com/#/sa/default/02E3
-//    // 
-//    // Car
-//    //Command<Commands::GET_CAR_SPEED>(hVeh);
-//
-//    // Lock car doors
-//    // https://library.sannybuilder.com/#/sa/default/020A
-//    // Will this work?
-//    //Command<Commands::LOCK_CAR_DOORS>(hVeh);
-//
-//    // Explode
-//    // https://library.sannybuilder.com/#/sa/default/020B
-//    //
-//    //Command<Commands::EXPLODE_CAR>(hVeh);
-//
-//
-//}
+
 
 //void TestPage::PlayerTest() {
 //    CPlayerPed* player = FindPlayerPed();
@@ -103,11 +89,45 @@ TestPage::TestPage()
 void PlayerTestFeatures() 
 {
     CPlayerPed* player = FindPlayerPed();
+
+    // Not sure how to get the garage id.
+    // TODO
+    // 
+    // Work on messing with garages
+    // https://library.sannybuilder.com/#/sa/classes/Garage
+    // 
+    // Work on adding objects using code
+    // Add pickups such as money, health, mines, bombs.
+    // 
+    // Get, add to and decrement stats.
+    // https://library.sannybuilder.com/#/sa/classes/Stat
+    // https://gtamods.com/wiki/List_of_statistics_(SA)
+
+    // Mess around with tasks
+    // https://library.sannybuilder.com/#/sa/classes/Task
+
+    // Weather
+    // https://library.sannybuilder.com/#/sa/classes/Weather
+
+    // World
+    // https://library.sannybuilder.com/#/sa/classes/World
+
+    // Zone
+    // https://library.sannybuilder.com/#/sa/classes/Zone
+
+
+
     int hplayer = CPools::GetPedRef(player);
     CVehicle* pVeh = nullptr;
     CVector pos = player->GetPosition();
 }
 
+
+bool test = false;
+//bool toggleHud = true;
+//bool toggleRadar = true;
+bool enterCrane = false;
+//bool playerCanDrown = true;
 
 void TestPage::Draw()
 {
@@ -117,129 +137,59 @@ void TestPage::Draw()
     {
         if (ImGui::BeginTabItem(TEXT("Test.TestVehicle")))
         {
+            // This works for seperating out the menus!
+            // 6-15-2024 @ 2:05PM
+            ImGui::Text("Hello from KCNet");
             ImGui::Text("Vehicle Tab");
+            VehicleTestPage::VehicleTestMenu();
             //static int selected = Locale::GetCurrentLocaleIndex();
             //static std::vector<std::string>& vec = Locale::GetLocaleList();
-
-            ImGui::Text("Hello from KCNet");
-            if (ImGui::Button("Blow up Car"))
-            {
-#ifdef GTASA
-                //CPlayerPed* player = FindPlayerPed();
-                int hplayer = CPools::GetPedRef(player);
-                CVehicle* pVeh = nullptr;
-
-                // This actually does work.
-                bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
-                if (bInVehicle)
-                {
-                    CVehicle* pVeh = player->m_pVehicle;
-                    int hVeh = CPools::GetVehicleRef(pVeh);
-                    Command<Commands::EXPLODE_CAR>(hVeh);
-                }
-#endif
-            }
-
-            if (ImGui::Button("Close doors"))
-            {
-#ifdef GTASA
-
-                int hplayer = CPools::GetPedRef(player);
-                CVehicle* pVeh = nullptr;
-
-                bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
-                if (bInVehicle)
-                {
-                    CVehicle* pVeh = player->m_pVehicle;
-                    int hVeh = CPools::GetVehicleRef(pVeh);
-                    Command<Commands::CLOSE_ALL_CAR_DOORS>(hVeh);
-                }
-#endif
-            }
-
-            // This works for locking the car doors.
-            if (ImGui::Button("Lock doors"))
-            {
-#ifdef GTASA
-
-                int hplayer = CPools::GetPedRef(player);
-                CVehicle* pVeh = nullptr;
-
-                bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
-                if (bInVehicle)
-                {
-                    CVehicle* pVeh = player->m_pVehicle;
-                    int hVeh = CPools::GetVehicleRef(pVeh);
-                    bool isCarLocked = Command<Commands::GET_CAR_DOOR_LOCK_STATUS>(hVeh);
-                    //bool isCarLocked = player->m_pVehicle->m_eDoorLock;
-
-                    // https://library.sannybuilder.com/#/sa/default/020A
-                    // https://library.sannybuilder.com/#/sa/enums/CarLock
-                    if (!isCarLocked)
-                    {
-                        // 2 - Locked
-                        Command<Commands::LOCK_CAR_DOORS>(hVeh, 2);
-                        Util::SetMessage("Car has been locked!");
-                    }
-                    else
-                    {
-                        // 1 - Unlocked
-                        Command<Commands::LOCK_CAR_DOORS>(hVeh, 1);
-                        Util::SetMessage("Car has been unlocked!");
-                    }
-                }
-                else
-                {
-                    // I wonder how to get the last vehicle the player was in to unlock it.
-                }
-#endif
-            }
-            //}
             ImGui::EndTabItem();
         }
 
         if (ImGui::BeginTabItem(TEXT("Test.TestFeatures")))
         {
-            if (ImGui::Button("Suicide"))
-            {
-                //CPlayerPed* player = FindPlayerPed();
-                int hplayer = CPools::GetPedRef(player);
-                Command<Commands::EXPLODE_CHAR_HEAD>(hplayer);
-            }
+            // Incomplete
+            PedTestPage::PlayerTestMenu();
+            //
+            //if (ImGui::Button("Suicide"))
+            //{
+            //    //CPlayerPed* player = FindPlayerPed();
+            //    int hplayer = CPools::GetPedRef(player);
+            //    Command<Commands::EXPLODE_CHAR_HEAD>(hplayer);
+            //}
 
-            if (ImGui::Button("Bomb")) {
-                CPlayerPed* player = FindPlayerPed();
-                int hplayer = CPools::GetPedRef(player);
+            //if (ImGui::Button("Bomb")) {
+            //    CPlayerPed* player = FindPlayerPed();
+            //    int hplayer = CPools::GetPedRef(player);
 
-                CVector playerPos = player->GetPosition();
+            //    CVector playerPos = player->GetPosition();
 
-                // https://library.sannybuilder.com/#/sa/default/020C
-                // x, y, z, EXPLOSION_CAR
-                Command<Commands::ADD_EXPLOSION>(playerPos.x, playerPos.y, playerPos.z, EXPLOSION_CAR);
-            }
+            //    // https://library.sannybuilder.com/#/sa/default/020C
+            //    // x, y, z, EXPLOSION_CAR
+            //    Command<Commands::ADD_EXPLOSION>(playerPos.x, playerPos.y, playerPos.z, EXPLOSION_CAR);
+            //}
 
-            if (ImGui::Button("Show coords"))
-            {
-                CVector playerCoords = player->GetPosition();
-                //std::string text = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
-                //int playerX = playerCoords.x;
-                //int playerY = playerCoords.y;
-                //int playerZ = playerCoords.z;
+            //if (ImGui::Button("Show coords"))
+            //{
+            //    CVector playerCoords = player->GetPosition();
+            //    //std::string text = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
+            //    //int playerX = playerCoords.x;
+            //    //int playerY = playerCoords.y;
+            //    //int playerZ = playerCoords.z;
 
-                std::string playerX = std::to_string(playerCoords.x);
-                std::string playerY = std::to_string(playerCoords.y);
-                std::string playerZ = std::to_string(playerCoords.z);
+            //    std::string playerX = std::to_string(playerCoords.x);
+            //    std::string playerY = std::to_string(playerCoords.y);
+            //    std::string playerZ = std::to_string(playerCoords.z);
 
-
-
-                // This works for showing just the X coord, I cannot concatenate these values though
-                //Util::SetMessage(playerXChar);
-                // Taken idea from freecam_sa.cpp on line 156
-                // This works!!
-                // 6-14-2024 @ 2:34PM
-                Util::SetMessage(std::format("X: {} Y: {} Z: {}", playerX, playerY, playerZ).c_str());
-                //Util::SetMessage("X: " + playerXChar + " Y: " + playerYChar + " Z: " + playerZChar);
-            }
+            //    // This works for showing just the X coord, I cannot concatenate these values though
+            //    //Util::SetMessage(playerXChar);
+            //    // Taken idea from freecam_sa.cpp on line 156
+            //    // This works!!
+            //    // 6-14-2024 @ 2:34PM
+            //    Util::SetMessage(std::format("X: {} Y: {} Z: {}", playerX, playerY, playerZ).c_str());
+            //    //Util::SetMessage("X: " + playerXChar + " Y: " + playerYChar + " Z: " + playerZChar);
+            //}
 
             //if (ImGui::Button("Show Marker Coords"))
             //{
@@ -253,15 +203,147 @@ void TestPage::Draw()
             //    //Command<Commands::BLIP>(playerPos.x, playerPos.y, playerPos.z, EXPLOSION_CAR);
 
             //}
+            //ImGui::Columns(2, NULL, false);
 
-            if (ImGui::Button("Blow up all cars")) {
+
+
 #ifdef GTASA
-                CCheat::BlowUpCarsCheat();
-                Util::SetMessage("All cars have been exterminated!");
-#else
-                Util::SetMessage("Only works for SA!");
-#endif
+            //ImGui::NextColumn();
+            // https://github.com/JuniorDjjr/CLEOPlus/blob/main/CLEOPlus/Misc.cpp#L261-L266
+            // reinterpret_cast<CRunningScript*>(thread)->UpdateCompareFlag(CCheat::m_aCheatsActive[i]);
+                
+
+            // I wonder how to spawn a different pickup
+            if (ImGui::Button("Health pickup"))
+            {
+                CVector playerPos = player->GetPosition();
+                int playerX = playerPos.x;
+                int playerY = playerPos.y;
+                int playerZ = playerPos.z;
+
+                // Needs some more arguments.
+                //CPickup::GiveUsAPickUpObject(CObject::, -1);
+                //CPickups::CreatePickupCoorsCloseToCoors(playerPos.x, playerPos.y, playerPos.z);
             }
+
+
+            //ImGui::SameLine();
+
+            ImGui::Text("Spawn 50k near your position");
+            if (ImGui::Button("Money pickup"))
+            {
+                CVector playerPos = player->GetPosition();
+                CVector newPos = CVector(playerPos.x + 3, playerPos.y + 3, playerPos.z);
+
+                CPickups::CreateSomeMoney(newPos, 50000);
+                Util::SetMessage("You have spawned 50k near you!");
+            }
+            ImGui::Separator();
+
+            // Not sure how this one works
+            //CCheckpoints::PlaceMarker();
+            if (ImGui::Button("Create Checkpoint")) 
+            {
+
+            }
+            ImGui::SameLine();
+            ImGui::Text("Doesn't work!");
+
+            if (ImGui::Button("Remove checkpoint"))
+            {
+            
+            }
+            ImGui::SameLine();
+            ImGui::Text("Doesn't work!");
+
+            // Hud functions
+            HudTestPage::HudTestMenu();
+
+            // Not sure how these work.
+            // https://library.sannybuilder.com/#/sa/classes/Crane
+            if (ImGui::Checkbox("Enter Crane", &enterCrane))
+            {
+                if(enterCrane)
+                {
+                    // https://library.sannybuilder.com/#/sa/default/079D
+                    Command<Commands::PLAYER_ENTERED_DOCK_CRANE>();
+                }
+                else
+                {
+                    // https://library.sannybuilder.com/#/sa/default/079F
+                    Command<Commands::PLAYER_LEFT_CRANE>();
+                }
+            }
+
+            // This seems to work fine.
+            //if (ImGui::Checkbox("Player drowns", &playerCanDrown))
+            //{
+            //    int hPlayer = CPools::GetPedRef(player);
+            //    if (!playerCanDrown) {
+            //        Command<Commands::SET_CHAR_DROWNS_IN_WATER>(hPlayer, false);
+            //        Util::SetMessage("You can no longer drown!");
+            //    }
+            //    else
+            //    {
+            //        Command<Commands::SET_CHAR_DROWNS_IN_WATER>(hPlayer, true);
+            //        Util::SetMessage("You can now drown again!");
+
+            //    }
+            //}
+
+            // This works
+            if (ImGui::Button("Play Mission Passed"))
+            {
+                // https://library.sannybuilder.com/#/sa/default/0394
+                Command<Commands::PLAY_MISSION_PASSED_TUNE>(1);
+                //bool isFlyingActive = CCheat::m_aCheatsActive);
+                //Util::SetMessage(std::format("Is Flying Active: {}", isFlyingActive).c_str());
+            }
+
+            // Doesn't work
+//            if (ImGui::Button("Show corona"))
+//            {
+           // I wonder How I would use this?
+           // I would need to define it somehow
+           //CCorona
+           //CCoronas::RegisterCorona();
+//            }
+
+            /*
+            * void PedPage::AddNewPed()
+            Example for what i'm trying to do spawning in a ped.
+                    Command<Commands::REQUEST_MODEL>(model);
+                    Command<Commands::LOAD_ALL_MODELS_NOW>();
+                    if (Command<Commands::IS_MODEL_AVAILABLE>(model))
+            {
+                std::string key = std::format("Custom.{} (Added)", name);
+                m_PedData.m_pData->Set(key.c_str(), std::to_string(model));
+                m_PedData.m_pData->Save();
+                Util::SetMessage(TEXT("Ped.AddPedMSG"));
+                Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
+            }
+            else
+            {
+                Util::SetMessage(TEXT("Vehicle.InvalidID"));
+            }
+            */
+
+            // First request the model
+            // Then load all models
+            // Lastly check if the model is available.
+            // If not say "Invalid model"
+
+            // 
+            //if (ImGui::Button("Spawn Ped"))
+            //{
+            //    //CPed* pPed = new CPed::;
+            //    //CWaterLevel::
+            //    //CWorld::Add()
+            //}
+
+            // Clothes
+
+#endif
 
             //if (ImGui::Button("Spawn ped to attack vehicle"))
             //{

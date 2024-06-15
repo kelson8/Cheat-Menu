@@ -21,5 +21,3 @@ public:
 };
 
 extern TestPage& testPage;
-
-// This doesn't do anything yet, I would like to add a custom tab to the Cheat menu
