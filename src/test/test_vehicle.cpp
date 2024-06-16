@@ -44,23 +44,30 @@ bool bFlyingCars = false;
 bool bSearchLight = false;
 bool bVehGodMode = false;
 
-void VehicleTestPage::VehicleTestMenu() {
+static void BlowUpAllCarsMenu()
+{
 #ifdef GTASA
     CPlayerPed* player = FindPlayerPed();
     int hplayer = CPools::GetPedRef(player);
     CVehicle* pVeh = nullptr;
     CVector pos = player->GetPosition();
-    
+
     if (ImGui::Button("Blow up all cars")) {
 
         CCheat::BlowUpCarsCheat();
         Util::SetMessage("All cars have been exterminated!");
 #else
-        Util::SetMessage("Only works for SA!");
-#endif
-    }
+    Util::SetMessage("Only works for SA!");
 
+    }
+#endif //GTASA
+    }
+}
+
+static void SearchLightMenu() 
+{
 #ifdef GTASA
+    CPlayerPed* player = FindPlayerPed();
     // Try to toggle the search lights in police helicopters, is it toggleable in SA? I think I did it in FiveM.
     if (ImGui::Checkbox("Search Light", &bSearchLight))
     {
@@ -76,13 +83,15 @@ void VehicleTestPage::VehicleTestMenu() {
             //CHeli::AddHeliSearchLight();
         }
     }
+    ImGui::SameLine();
+    ImGui::Text("Doesn't work!");
 #endif //GTASA
-    // https://github.com/JuniorDjjr/CLEOPlus/blob/main/CLEOPlus/Misc.cpp#L261-L266
-        /*
-        reinterpret_cast<CRunningScript*>(thread)->UpdateCompareFlag(CCheat::m_aCheatsActive[i]);
-        */
+}
 
+static void BlowUpVehicleMenu()
+{
 #ifdef GTASA
+    CPlayerPed* player = FindPlayerPed();
     if (ImGui::Button("Blow up Current Car"))
     {
 
@@ -101,8 +110,12 @@ void VehicleTestPage::VehicleTestMenu() {
 
     }
 #endif //GTASA
+}
 
+static void CloseDoorsMenu()
+{
 #ifdef GTASA
+    CPlayerPed* player = FindPlayerPed();
     // Works for closing the doors, not the trunk or hood though.
     if (ImGui::Button("Close doors"))
     {
@@ -119,9 +132,13 @@ void VehicleTestPage::VehicleTestMenu() {
             Command<Commands::CLOSE_ALL_CAR_DOORS>(hVeh);
         }
     }
-#endif //GTASA
+}
+#endif
 
+static void LockDoorsMenu()
+{
 #ifdef GTASA
+    CPlayerPed* player = FindPlayerPed();
     // This works for locking the car doors.
     if (ImGui::Button("Lock doors"))
     {
@@ -159,42 +176,49 @@ void VehicleTestPage::VehicleTestMenu() {
         }
     }
 #endif //GTASA
-    //}
+}
 
-    // This works
+static void FlyingCarsMenu()
+{
+        // This works
 #ifdef GTASA
-    if (ImGui::Checkbox("Flying cars", &bFlyingCars))
-    {
-        // In cleo redux I can read and write to memory addresses, not sure how on here.
-        // I figured it out in the below code using a function in this menu.
-        // Example: 
-        /*
-        * (Written in JavaScript)
-            player.clearWantedLevel();
-            Memory.Write(0x969171, 1, 1, false);
-
-            // Flying cars cheat.
-            */
-
-            // Idea for this game from game.cpp on line 359
-        if (bFlyingCars)
+    CPlayerPed* player = FindPlayerPed();
+        if (ImGui::Checkbox("Flying cars", &bFlyingCars))
         {
-            patch::Set<byte>(0x969160, 1, true);
-            Util::SetMessage("Cars can now fly!");
+            // In cleo redux I can read and write to memory addresses, not sure how on here.
+            // I figured it out in the below code using a function in this menu.
+            // Example: 
+            /*
+            * (Written in JavaScript)
+                player.clearWantedLevel();
+                Memory.Write(0x969171, 1, 1, false);
+
+                // Flying cars cheat.
+                */
+
+                // Idea for this game from game.cpp on line 359
+            if (bFlyingCars)
+            {
+                patch::Set<byte>(0x969160, 1, true);
+                Util::SetMessage("Cars can now fly!");
+            }
+            else
+            {
+                patch::Set<byte>(0x969160, 0, true);
+                Util::SetMessage("Cars can no longer fly!");
+            }
+            // CallDynGlobal seems to be what they are using for cheats in the plugin-sdk
+            //CallDynGlobal<0x969160>;
+            // Gives an error though
         }
-        else
-        {
-            patch::Set<byte>(0x969160, 0, true);
-            Util::SetMessage("Cars can no longer fly!");
-        }
-        // CallDynGlobal seems to be what they are using for cheats in the plugin-sdk
-        //CallDynGlobal<0x969160>;
-        // Gives an error though
-    }
 #endif //GTASA
+}
 
+static void InvincibleCarsMenu()
+{
+    
 #ifdef GTASA
-
+    CPlayerPed* player = FindPlayerPed();
     // This works, this was a quick test I came up with.
     if (ImGui::Checkbox("Invincible car", &bVehGodMode))
     {
@@ -226,8 +250,13 @@ void VehicleTestPage::VehicleTestMenu() {
         }
     }
 #endif //GTASA
+}
 
+static void IsCarInWaterMenu()
+{
+    
 #ifdef GTASA
+    CPlayerPed* player = FindPlayerPed();
     // Working
     if (ImGui::Button("Is car in water"))
     {
@@ -258,6 +287,33 @@ void VehicleTestPage::VehicleTestMenu() {
 }
 #endif //GTASA
 
+void VehicleTestPage::VehicleTestMenu() {
+//#ifdef GTASA
+//    CPlayerPed* player = FindPlayerPed();
+//    int hplayer = CPools::GetPedRef(player);
+//    CVehicle* pVeh = nullptr;
+//    CVector pos = player->GetPosition();
+//
+//    if (ImGui::Button("Blow up all cars")) {
+//
+//        CCheat::BlowUpCarsCheat();
+//        Util::SetMessage("All cars have been exterminated!");
+//#else
+//    Util::SetMessage("Only works for SA!");
+//
+//    }
+//#endif //GTASA
+
+    BlowUpAllCarsMenu();
+    SearchLightMenu();
+    BlowUpVehicleMenu();
+    CloseDoorsMenu();
+    LockDoorsMenu();
+    FlyingCarsMenu();
+    InvincibleCarsMenu();
+    IsCarInWaterMenu();
+
+}
 
 
 // void VehiclePage::Draw()
