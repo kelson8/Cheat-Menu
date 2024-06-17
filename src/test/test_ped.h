@@ -4,10 +4,10 @@
 class PedTestPage
 {
 private:
-	PedTestPage();
-	PedTestPage(const PedTestPage&);
 	void Draw();
 public:
+	PedTestPage();
+	PedTestPage(const PedTestPage&);
 	//static void PedTestMenu();
-	static void PlayerTestMenu();
+	void PlayerTestMenu();
 };

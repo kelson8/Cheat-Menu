@@ -4,9 +4,9 @@
 class HudTestPage
 {
 private:
-	HudTestPage();
-	HudTestPage(const HudTestPage&);
 	void Draw();
 public:
-	static void HudTestMenu();
+	HudTestPage();
+	HudTestPage(const HudTestPage&);
+	void HudTestMenu();
 };
