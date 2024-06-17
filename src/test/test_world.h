@@ -4,9 +4,12 @@
 class WorldTestPage
 {
 private:
-	WorldTestPage();
-	WorldTestPage(const WorldTestPage&);
 	void Draw();
 public:
-	static void WorldTestMenu();
+	// I had to change these two values to public for this to work, even though they arent in use.
+	WorldTestPage();
+	WorldTestPage(const WorldTestPage&);
+	//
+	//static void WorldTestMenu();
+	void WorldTestMenu();
 };

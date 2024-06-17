@@ -2,11 +2,23 @@
 #include "test_world.h"
 #include "utils/widget.h"
 
+
+#ifdef GTASA
+#include "CCoronas.h"
+#include "CGeneral.h"
+#endif //GTASA
+
+// This is needed so it doesn't get unresvoled external symbol errors without using static.
+WorldTestPage::WorldTestPage()
+{
+
+}
+
 void WeatherMenu()
 {
     // Weather
 // Will these work?
-
+#ifdef GTASA
 // Will giving this a default value fix the crashing? I think the weather is crashing it.
     int defaultWeatherType = 0;
     //eWeatherType defaultWeatherType = WEATHER_CLOUDY_COUNTRYSIDE;
@@ -16,6 +28,7 @@ void WeatherMenu()
     //    WEATHER_CLOUDY_COUNTRYSIDE, WEATHER_CLOUDY_LA, WEATHER_CLOUDY_SF,
     //    WEATHER_CLOUDY_VEGAS
     //};
+
 
     static std::vector<std::string> allWeatherTypes = {
         "Extra Sunny LA", "Sunny LA", "Smog LA", "Sunny Smog LA",
@@ -89,6 +102,7 @@ void WeatherMenu()
         // How would I store the value for this?
         //CWeather::ForceWeatherNow();
     }
+#endif //GTASA
 }
 
 static void CreateCheckpointMenu()
@@ -115,8 +129,69 @@ static void RemoveCheckpointMenu()
 
 
 
+
+void CreateCoronaTestMenu()
+{
+    CPlayerPed* player = FindPlayerPed();
+    CVector playerCoords = player->GetPosition();
+    
+    // Obtained from Entity.cpp on lines 580-602 in the Reversed gta sa project.
+    // This doesn't work at all.
+#ifdef _TEST
+        //auto fRand = static_cast<float>(CGeneral::GetRandomNumberInRange() % 16) / 16.0F;
+    // CVector vecPos = CPlaceable::GetPosition();
+    //fRand = std::max(fRand, 0.5F);
+    int fRand = rand();
+    CCoronas::RegisterCorona(
+        // Idk how to use this.
+        reinterpret_cast<uint32_t>(this),
+        nullptr,
+        static_cast<uint8_t>(fRand * 255.0F),
+        static_cast<uint8_t>(fRand * 220.0F),
+        static_cast<uint8_t>(fRand * 190.0F),
+        255,
+        playerCoords,
+        fRand * 6.0F,
+        300.0F,
+        gpCoronaTexture[0],
+        eCoronaFlareType::FLARETYPE_NONE,
+        true,
+        false,
+        0,
+        0.0F,
+        false,
+        1.5F,
+        0,
+        15.0F,
+        false,
+        false
+    );
+#endif //_TEST
+}
+
+static void RemoveCoronaTestMenu()
+{
+
+}
+
+
+/// <summary>
+/// Main code for WorldTestMenu
+/// </summary>
 void WorldTestPage::WorldTestMenu()
 {
+    // This doesn't seem to crash it being empty in here.
+    Events::initScriptsEvent += [this]()
+        {
+
+        };
+
+    /*
+    Events::processScriptsEvent += [this]()
+        {
+
+        };
+    */
     /*
     Refactor these to have the tabs in each file instead of in the test.cpp file
    // TEXT(Test.TestWorldMenu) - Test World Menu
