@@ -9,6 +9,10 @@
 #include "pages/teleport.h"
 #include "pages/menu.h"
 
+// My headers
+#include "test/functions/player_functions.h"
+#include "test/events/test_events.h"
+
 // 6-14-2024 @ 11:34AM - kelson8
 // I setup this for building the asi:
 // https://stackoverflow.com/questions/1776060/how-to-make-visual-studio-copy-a-dll-file-to-the-output-directory
@@ -226,6 +230,7 @@ CheatMenuMgr::CheatMenuMgr()
     // Doesn't work with ThirteenAG's windowed mode while inside initRwEvent
     Events::initGameEvent += [this]() 
     {
+
         if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw)))
         {
             return;
@@ -234,8 +239,26 @@ CheatMenuMgr::CheatMenuMgr()
         ApplyStyle();
     };
 
+    // New
+    Events::gameProcessEvent += [this]()
+        {
+            //
+            // Custom events
+            // Chaos mode, these only run when defined in the test_events.cpp file.
+            TestEvents::KillPlayerIfAiming();
+            TestEvents::ChaosModeEvent();
+        };
+
+    
     Events::processScriptsEvent += [this]()
     {
+
+            //
+            // Custom events
+            // Chaos mode, these only run when defined in the test_events.cpp file.
+            TestEvents::DrowningExplosionEvent();
+            //
+
         if (!FrontEndMenuManager.m_bMenuActive)
         {
             if (menuOpen.Pressed())

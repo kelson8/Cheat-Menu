@@ -18,6 +18,9 @@
     https://github.com/user-grinch/Cheat-Menu
 */
 
+// TODO Move this into my own menu named KCNet-SAMenu, possibly try to make it work on Vice City and 3.
+
+
 // TODO Figure out how to get the coordniates of where the player is looking at, I think that should be possible.
 // TODO Try to get this working on VC and 3 sometime, the menu normally works on those games I would just have to make sure I don't have any SA specific 
 //  memory addresses or anything in it.
@@ -32,6 +35,9 @@
 // Set ped density multiplier: https://library.sannybuilder.com/#/sa/default/03DE
 // Set ped vehicle multipler: https://library.sannybuilder.com/#/sa/default/01EB
 // 
+
+// This guide might be useful:
+// https://www.open.mp/docs/tutorials/PluginDevelopmentGuide
 
 
 #ifdef GTASA
@@ -86,7 +92,8 @@
 #include "test_hud.h"
 #include "test_ped.h"
 #include "test_world.h"
-#include "player_functions.h"
+#include "functions/player_functions.h"
+#include "functions/vehicle_functions.h"
 
 // Well I had this working but then broke it 6-14-2024 @ 3:51PM...
 // I fixed it 3:53PM.
@@ -292,6 +299,7 @@ void TestPage::Draw()
             if (ImGui::Button("Play Mission Passed"))
             {
                 // https://library.sannybuilder.com/#/sa/default/0394
+                
                 Command<Commands::PLAY_MISSION_PASSED_TUNE>(1);
                 //bool isFlyingActive = CCheat::m_aCheatsActive);
                 //Util::SetMessage(std::format("Is Flying Active: {}", isFlyingActive).c_str());
@@ -331,6 +339,29 @@ void TestPage::Draw()
             //////
             // New
             ImGui::Separator();
+
+            ImGui::Text("In game clock");
+
+
+            //if (ImGui::Button("Show mili Seconds?")) 
+            //{
+            //    short currentGameSeconds = CClock::ms_nGameClockSeconds;
+            //    Util::SetMessage(std::format("ms {}", currentGameSeconds).c_str());
+            //}
+
+            if (ImGui::Button("Show hours")) 
+            {
+                short currentGameHours = CClock::ms_nGameClockHours;
+                Util::SetMessage(std::format("Hour: {}", currentGameHours).c_str());
+            }
+
+            if (ImGui::Button("Show Minutes"))
+            {
+                short currentGameMinutes = CClock::ms_nGameClockMinutes;
+                Util::SetMessage(std::format("Minute: {}", currentGameMinutes).c_str());
+            }
+
+            // Train Menu
             TrainTestMenu();
             //////
 
