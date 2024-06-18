@@ -1,5 +1,20 @@
 #include "pch.h"
+// My code
 #include "test_vehicle.h"
+#include "functions/vehicle_functions.h"
+#include "functions/player_functions.h"
+
+#ifdef GTASA
+// Radio Test
+#include "CAERadioTrackManager.h"
+#include "CAudioEngine.h"
+// I can disable the radio and change its type using this
+#include "CAEVehicleAudioEntity.h"
+
+#include "CBmx.h"
+
+
+#endif //GTASA
 
 //void TestPage::VehicleTest() {
 //    // These are neat, the BY_GAME defines seem to have everything in this order: SA, VC, 3.
@@ -44,6 +59,11 @@ bool bFlyingCars = false;
 bool bSearchLight = false;
 bool bVehGodMode = false;
 
+VehicleTestPage::VehicleTestPage()
+{
+
+}
+
 static void BlowUpAllCarsMenu()
 {
 #ifdef GTASA
@@ -56,13 +76,16 @@ static void BlowUpAllCarsMenu()
 
         CCheat::BlowUpCarsCheat();
         Util::SetMessage("All cars have been exterminated!");
+    }
+}
 #else
     Util::SetMessage("Only works for SA!");
 
     }
 #endif //GTASA
-    }
-}
+
+
+
 
 static void SearchLightMenu() 
 {
@@ -119,8 +142,6 @@ static void CloseDoorsMenu()
     // Works for closing the doors, not the trunk or hood though.
     if (ImGui::Button("Close doors"))
     {
-
-
         int hplayer = CPools::GetPedRef(player);
         CVehicle* pVeh = nullptr;
 
@@ -132,8 +153,10 @@ static void CloseDoorsMenu()
             Command<Commands::CLOSE_ALL_CAR_DOORS>(hVeh);
         }
     }
+#endif //GTASA
 }
-#endif
+
+
 
 static void LockDoorsMenu()
 {
@@ -142,8 +165,6 @@ static void LockDoorsMenu()
     // This works for locking the car doors.
     if (ImGui::Button("Lock doors"))
     {
-
-
         int hplayer = CPools::GetPedRef(player);
         CVehicle* pVeh = nullptr;
 
@@ -176,7 +197,9 @@ static void LockDoorsMenu()
         }
     }
 #endif //GTASA
+
 }
+
 
 static void FlyingCarsMenu()
 {
@@ -264,16 +287,20 @@ static void IsCarInWaterMenu()
         CVehicle* pVeh = nullptr;
         bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
 
+        // TODO Possibly Move this into a vehicle_functions file.
+        // First we check if the player is in a vehicle
         if (bInVehicle) {
             CVehicle* pVeh = player->m_pVehicle;
             int hVeh = CPools::GetVehicleRef(pVeh);
             // https://library.sannybuilder.com/#/sa/default/04D8
             bool isCarInWater = Command<Commands::IS_CAR_IN_WATER>(hVeh);
-
+            
+            // If the car is not in water
             if (!isCarInWater)
             {
                 Util::SetMessage("Your car is dry.");
             }
+            // If the car is in water
             else
             {
                 Util::SetMessage("Your car is in the water.");
@@ -284,9 +311,193 @@ static void IsCarInWaterMenu()
             Util::SetMessage("You are not in a car!");
         }
     }
+#endif //GTASA
 }
+
+
+
+// Incomplete.
+static void RadioTest() {
+#ifdef GTASA
+    CAEVehicleAudioEntity* cAEVehicleAudioEntity = new CAEVehicleAudioEntity();
+    CAudioEngine* cAudioEngine = new CAudioEngine();
 #endif //GTASA
 
+    ImGui::Separator();
+    ImGui::Text("Radio Test");
+    bool toggleRadio = true;
+
+    if (ImGui::Checkbox("Toggle Radio", &toggleRadio)) {
+        if (!toggleRadio) {
+            // Idk how I would set these values
+            //eRadioType(RADIO_DISABLED);
+            //eRadioType == RADIO_DISABLED;
+            //cAudioEngine->;
+
+            //cAEVehicleAudioEntity.
+            // Disable the radio
+        }
+        else 
+        {
+            // Enable the radio
+        }
+    }
+}
+
+#define _TEST
+void BurstAllTiresMenu()
+{
+    CPlayerPed* player = FindPlayerPed();
+
+    if (ImGui::Button("Pop car tires")) {
+        int hplayer = CPools::GetPedRef(player);
+        CVehicle* pVeh = nullptr;
+        bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
+
+        //// First we check if the player is in a vehicle
+        if(bInVehicle)
+        {
+            //CVehicle* pVeh = player->m_pVehicle;
+            // I've never used this before
+            // https://github.com/DK22Pac/plugin-sdk/blob/master/examples/OpenDoorExample/Main.cpp#L69
+            CVehicle* pVehTest = FindPlayerVehicle(0, false);
+
+            //int hVeh = CPools::GetVehicleRef(pVeh);
+
+#define _SWITCH_TEST
+            
+#ifdef _SWITCH_TEST
+
+            eVehicleType vehicleType;
+
+            // Check if the player is in a vehicle.
+            if (pVehTest) {
+                int hVehTest = CPools::GetVehicleRef(pVehTest);
+                // I didn't know it was possible to use switch on an enum, this can be useful to cut down on a lot of duplicate code.
+                // Well this doesn't seem to work right, it always prints "Your car no longer has tires.
+                // https://stackoverflow.com/questions/3019153/how-do-i-use-an-enum-value-in-a-switch-statement-in-c
+                
+                // I'm not doing this right, it only ever says "Your car no longer has tires" even in a bike or boat.
+                // Also says the same for other vehicles too.
+                // https://github.com/DK22Pac/plugin-sdk/blob/master/examples/CreateCar/Main.cpp#L41
+                //switch (reinterpret_cast<CVehicleModelInfo*>(CModelInfo::ms_modelInfoPtrs[hVehTest])->m_nVehicleType) {
+                // This seems to crash it.
+                switch (pVeh->m_nVehicleClass) {
+                
+                case VEHICLE_AUTOMOBILE:
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 0);
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 1);
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 2);
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 3);
+                    Util::SetMessage("Your car no longer has tires!");
+                    break;
+                case VEHICLE_BIKE:
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 1);
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 2);
+                    Util::SetMessage("Your bike no longer has tires!");
+
+                    break;
+                case VEHICLE_BMX:
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 1);
+                    Command<Commands::BURST_CAR_TYRE>(hVehTest, 2);
+                    Util::SetMessage("Your bike no longer has tires!");
+                    break;
+                default:
+                    Util::SetMessage("Only works for cars and bikes!");
+                    break;
+                }
+
+
+                //switch (vehicleType) {
+
+             
+            }
+#else
+            // This works
+            // TODO Setup for loop for this and check if the car is a motorcycle
+            if (pVehTest && pVehTest->m_nVehicleClass == VEHICLE_AUTOMOBILE)
+            {
+                int hVehTest = CPools::GetVehicleRef(pVehTest);
+                // https://github.com/DK22Pac/plugin-sdk/blob/master/examples/OpenDoorExample/Main.cpp#L71
+                CAutomobile* autoMobile = reinterpret_cast<CAutomobile*>(pVehTest);
+
+                // TODO Set this to where it detects if the vehicle has 4 tires or not.
+                Command<Commands::BURST_CAR_TYRE>(hVehTest, 1);
+                Command<Commands::BURST_CAR_TYRE>(hVehTest, 2);
+                Command<Commands::BURST_CAR_TYRE>(hVehTest, 3);
+                Command<Commands::BURST_CAR_TYRE>(hVehTest, 4);
+            }
+#endif //_SWITCH_TEST
+        }
+    }
+}
+
+/// <summary>
+/// Quick test for checking if the VehicleFunctions class is working properly, it seems to be working fine.
+/// </summary>
+void CarCheckTestMenu()
+{
+    VehicleFunctions* vehicleFunctions = new VehicleFunctions();
+
+    // Table test
+    // This adds a border for it. ImGuiTableFlags_Borders
+
+    // The flag I have set below removes the borders for the tables.
+    if(ImGui::BeginTable("VehicleTable", 4, ImGuiTableFlags_NoBordersInBody)) 
+    {
+        // 1
+        ImGui::TableNextColumn();
+        if (ImGui::Button("In vehicle?"))
+        {
+            // Only shows the "In a car" message if the player is in a vehicle
+            VehicleFunctions::PlayerInCarMsg();
+        }
+
+        // 2
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Car in water?"))
+        {
+            if (PlayerFunctions::IsPlayerInVehicle())
+            {
+                if (VehicleFunctions::IsCarInWater())
+                {
+                    Util::SetMessage("Your car is in the water.");
+                }
+                else
+                {
+                    Util::SetMessage("Your car is dry");
+                }
+            }
+            else
+            {
+                Util::SetMessage("You are not in a car!");
+            }
+        }
+
+        // 3
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Test1"))
+        {
+            Util::SetMessage("Not implemented!");
+        }
+
+        // 4
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Test2"))
+        {
+            Util::SetMessage("Not implemented!");
+        }
+
+        ImGui::EndTable();
+
+        // Fix columns being broken
+        ImGui::Columns(1);
+    }
+}
+
+/// <summary>
+/// Main code for VehicleTestMenu
+/// </summary>
 void VehicleTestPage::VehicleTestMenu() {
 //#ifdef GTASA
 //    CPlayerPed* player = FindPlayerPed();
@@ -304,6 +515,8 @@ void VehicleTestPage::VehicleTestMenu() {
 //    }
 //#endif //GTASA
 
+    // These should be ordered in whatever order they are specified here.
+    // Most of these are private to this file, they can be put into the header file to be made public if needed for other classes.
     BlowUpAllCarsMenu();
     SearchLightMenu();
     BlowUpVehicleMenu();
@@ -312,6 +525,14 @@ void VehicleTestPage::VehicleTestMenu() {
     FlyingCarsMenu();
     InvincibleCarsMenu();
     IsCarInWaterMenu();
+
+    // New
+#ifdef _TEST
+    BurstAllTiresMenu();
+
+    ImGui::Separator();
+    CarCheckTestMenu();
+#endif //_TEST
 
 }
 

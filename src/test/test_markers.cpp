@@ -13,6 +13,9 @@ static void CoronasMenu()
 //            }
 }
 
+/// <summary>
+/// Main code for MarkersTestMenu
+/// </summary>
 void MarkersTestPage::MarkersTestMenu() 
 {
 #ifdef _TEST

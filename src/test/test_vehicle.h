@@ -4,9 +4,9 @@
 class VehicleTestPage
 {
 private:
-	VehicleTestPage();
-	VehicleTestPage(const VehicleTestPage&);
 	void Draw();
 public:
+	VehicleTestPage();
+	VehicleTestPage(const VehicleTestPage&);
 	static void VehicleTestMenu();
 };

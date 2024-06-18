@@ -129,6 +129,9 @@ static void RemoveCheckpointMenu()
 
 
 
+/// <summary>
+/// Create corona menu (Creates a corona at the specified coords)
+/// </summary>
 
 void CreateCoronaTestMenu()
 {
@@ -169,6 +172,9 @@ void CreateCoronaTestMenu()
 #endif //_TEST
 }
 
+/// <summary>
+/// Remove corona menu
+/// </summary>
 static void RemoveCoronaTestMenu()
 {
 

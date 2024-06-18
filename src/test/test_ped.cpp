@@ -9,11 +9,17 @@
 #endif
 
 // My code
-#include "player_functions.h"
+#include "functions/player_functions.h"
+#include "../enums/audio_ids.h"
 
 // Incomplete.
 // https://library.sannybuilder.com/#/sa/default/0672
 //Command<Commands::TASK_DESTROY_CAR>(pPed);
+
+// This might be fun to mess with if I can figure out how to use the stats
+//player->m_pStats;
+
+// Try to mess with the values in this enum and play sounds: eAudioEvents
 
 
 PedTestPage::PedTestPage()
@@ -23,36 +29,17 @@ PedTestPage::PedTestPage()
 
 bool playerCanDrown = true;
 
-// https://sampwiki.blast.hk/wiki/SoundID
-enum soundIds {
-    BLANK_SOUND = 0,
-    CRASH_SOUND = 1009,
-    GARAGE_DOOR_OPENING = 1035,
-    SELECTION_SOUND = 1058,
-    METALLIC_FENCE_RATTLE1 = 1100,
-    METALLIC_FENCE_RATTLE2 = 1101,
-    SPRAY_CAN = 1134,
-    CRASH1_SOUND = 1140,
-    CRASH2_SOUND = 1141,
-    THROW_SATCHEL_SOUND = 1145,
-    CAR_HORN = 1147,
-    BLIP_SOUND = 1149,
-    EXPLOSION_SOUND = 1159,
-    HANGER_DOORS = 1165,
-    DRIVING_SCHOOL_RESULTS_MUSIC = 1183,
-    BIKE_BOAT_SCHOOL_RESULTS_MUSIC = 1183,
-    FLIGHT_SCHOOL_RESULTS_MUSIC = 1187,
-};
-
 //static std::vector<int> soundIds = {
+AudioIds* audioIds = new AudioIds();
+
 static std::vector<std::string> soundIds = {
-    std::to_string(BLANK_SOUND), std::to_string(CRASH_SOUND), std::to_string(GARAGE_DOOR_OPENING), 
-    std::to_string(SELECTION_SOUND), std::to_string(METALLIC_FENCE_RATTLE1), 
-    std::to_string(METALLIC_FENCE_RATTLE2), std::to_string(SPRAY_CAN),
-    std::to_string(CRASH1_SOUND), std::to_string(CRASH2_SOUND), std::to_string(THROW_SATCHEL_SOUND), std::to_string(CAR_HORN),
-    std::to_string(BLIP_SOUND), std::to_string(EXPLOSION_SOUND), 
-    std::to_string(HANGER_DOORS), std::to_string(DRIVING_SCHOOL_RESULTS_MUSIC),
-    std::to_string(BIKE_BOAT_SCHOOL_RESULTS_MUSIC), std::to_string(FLIGHT_SCHOOL_RESULTS_MUSIC)
+    std::to_string(AudioIds::BLANK_SOUND), std::to_string(AudioIds::CRASH_SOUND), std::to_string(AudioIds::GARAGE_DOOR_OPENING),
+    std::to_string(AudioIds::SELECTION_SOUND), std::to_string(AudioIds::METALLIC_FENCE_RATTLE1),
+    std::to_string(AudioIds::METALLIC_FENCE_RATTLE2), std::to_string(AudioIds::SPRAY_CAN),
+    std::to_string(AudioIds::CRASH1_SOUND), std::to_string(AudioIds::CRASH2_SOUND), std::to_string(AudioIds::THROW_SATCHEL_SOUND), std::to_string(AudioIds::CAR_HORN),
+    std::to_string(AudioIds::BLIP_SOUND), std::to_string(AudioIds::EXPLOSION_SOUND),
+    std::to_string(AudioIds::HANGER_DOORS), std::to_string(AudioIds::DRIVING_SCHOOL_RESULTS_MUSIC),
+    std::to_string(AudioIds::BIKE_BOAT_SCHOOL_RESULTS_MUSIC), std::to_string(AudioIds::FLIGHT_SCHOOL_RESULTS_MUSIC)
 };
 
 //static std::vector<int> soundIds = {
@@ -109,11 +96,19 @@ static void BombMenu()
         // https://library.sannybuilder.com/#/sa/default/018C
         // These might work: https://sampwiki.blast.hk/wiki/SoundID
         //Command<Commands::ADD_ONE_OFF_SOUND>(playerPos.x, playerPos.y, playerPos.z, 1159);
-        Command<Commands::ADD_ONE_OFF_SOUND>(playerPos.x, playerPos.y, playerPos.z, EXPLOSION_SOUND);
+        Command<Commands::ADD_ONE_OFF_SOUND>(playerPos.x, playerPos.y, playerPos.z, AudioIds::EXPLOSION_SOUND);
 
         // This does about the same as above with a bit more code.
         //CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, playerPos, 1000, 1, 1.0f, true);
     }
+#endif //GTASA
+}
+
+static void TestSoundMenu()
+{
+    // GTA SA specific sounds.
+#ifdef GTASA
+    
 #endif //GTASA
 }
 
@@ -293,6 +288,10 @@ static void SpawnRandomPed()
     CStreaming::LoadAllRequestedModels(false); // Whatever this does.
     CPed* ped = new CCivilianPed(CPopulation::IsFemale(modelID) ? PED_TYPE_CIVFEMALE : PED_TYPE_CIVMALE, modelID);
 
+    // New
+    // Idk how this one works
+    //ped->m_pIntelligence
+
     if (ped)
     {
         // Is this getting the offset for the coordinates?
@@ -316,76 +315,27 @@ static void SpawnPedMenu()
 
 #endif //GTASA
 
-// TODO Remove this later.
-/// <summary>
-/// Area check test.
-/// This seems to work.
-/// </summary>
-static void AreaCheckTest()
-{
-    CPlayerPed* player = FindPlayerPed();
-    int hplayer = CPools::GetPedRef(player);
 
-    CVector playerPos = player->GetPosition();
-    // TODO Setup some random coords for this
-    CVector testLocationArea1 = CVector(2, 2, 2);
-    CVector testLocationArea2 = CVector(20, 20, 20);
 
-    // https://library.sannybuilder.com/#/sa/default/00A4
-    //Command<Commands::IS_CHAR_IN_AREA_3D>(hplayer, 
-    //    testLocationArea1.x, testLocationArea1.y, testLocationArea1.z, 
-    //    testLocationArea2.x, testLocationArea2.y, testLocationArea2.z, true);
-
-    // Will this work?
-    if (Command<Commands::IS_CHAR_IN_AREA_3D>(hplayer,
-        testLocationArea1.x, testLocationArea1.y, testLocationArea1.z,
-        testLocationArea2.x, testLocationArea2.y, testLocationArea2.z, true)) {
-
-        Util::SetMessage("You are in the zone!");
-    }
-    else 
-    {
-        Util::SetMessage("You are not in the zone!");
-    }
-}
-
-// TODO Remove this later.
-/// <summary>
-/// Working on a new method for this.
-/// Kill the player when the enter this area, fires off with an event below.
-/// Returns true if the player is in the specified coords.
-/// </summary>
-static bool IsPlayerInArea() 
-{
-    CPlayerPed* player = FindPlayerPed();
-    int hplayer = CPools::GetPedRef(player);
-
-    CVector playerPos = player->GetPosition();
-    // TODO Setup some random coords for this
-    CVector testLocationArea1 = CVector(2, 2, 2);
-    CVector testLocationArea2 = CVector(20, 20, 20);
-
-    // https://library.sannybuilder.com/#/sa/default/00A4
-
-    // This seems to work fine.
-    if (Command<Commands::IS_CHAR_IN_AREA_3D>(hplayer,
-        testLocationArea1.x, testLocationArea1.y, testLocationArea1.z,
-        testLocationArea2.x, testLocationArea2.y, testLocationArea2.z, false)) {
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-// TODO Make this use the function I have defined in the PlayerFunctions class.
 static void AreaCheckTestMenu()
 {
+    CVector testLocationArea1 = CVector(2, 2, 2);
+    CVector testLocationArea2 = CVector(20, 20, 20);
+
     ImGui::Text("Area Check testing.");
     if (ImGui::Button("Check Area #1")) {
-        AreaCheckTest();
+        bool isPlayerInArea = PlayerFunctions::IsPlayerInArea(testLocationArea1.x, testLocationArea1.y, testLocationArea1.z, 
+            testLocationArea2.x, testLocationArea2.y, testLocationArea2.z);
+
+        if (isPlayerInArea) 
+        {
+            Util::SetMessage("You are in the zone.");
+        }
+        else
+        {
+            Util::SetMessage("You are not in the zone.");
+        }
+        //AreaCheckTest();
     }
 }
 
@@ -504,22 +454,8 @@ void PedTestPage::PlayerTestMenu()
     //Events::gameProcessEvent += [this]()
         {
             // Well this just spams the text and doesn't stop the noises when in the area.
-#ifdef _TEST
-            // This seems to work for killing the player in the area.
-            if (IsPlayerInArea()) {
-                
-                //KillPlayer();
-                //PlayerFunctions::KillPlayer();
-                //Util::SetMessage("Welcome to the circle");
-                //AreaCheckTest();
-            }
-            else
-            {
-
-                //Util::SetMessage("You will now die!");
-            }
-            
-#endif //_TEST1
+            // Moved KillPlayer and other chaos mode functions into player_functions.cpp.
+            // Moved the event into cheatmenu.cpp.
         };
 
     SuicideMenu();
