@@ -10,4 +10,6 @@ public:
 	PedTestPage(const PedTestPage&);
 	//static void PedTestMenu();
 	void PlayerTestMenu();
+	static void InsaneGravity();
+	static void NormalGravity();
 };

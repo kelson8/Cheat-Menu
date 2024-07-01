@@ -6,11 +6,15 @@
 #include "CExplosion.h"
 #include "CPopulation.h"
 #include "CTaskComplexWanderStandard.h"
+#include "CSprite.h"
 #endif
 
 // My code
 #include "functions/player_functions.h"
 #include "../enums/audio_ids.h"
+#include "functions/vehicle_functions.h"
+#include "functions/ped_functions.h"
+
 
 // Incomplete.
 // https://library.sannybuilder.com/#/sa/default/0672
@@ -50,17 +54,6 @@ static std::vector<std::string> soundIds = {
 //    BIKE_BOAT_SCHOOL_RESULTS_MUSIC, FLIGHT_SCHOOL_RESULTS_MUSIC
 //};
 
-// Taken from plugin-sdk examples under PedSpawner in Main.cpp
-int pedModelIds[] = { 0, 7, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 43, 44, 45, 46,
-    47, 48, 49, 50, 51, 52, 57, 58, 59, 60, 61, 62, 66, 67, 68, 70, 71, 72, 73, 78, 79, 80, 81, 82, 83, 84, 94, 95, 96, 97, 98, 99, 100, 101,
-    102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 120, 121, 122, 123, 124, 125, 126, 127, 128, 132,
-    133, 134, 135, 136, 137, 142, 143, 144, 146, 147, 153, 154, 155, 156, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 170, 171,
-    173, 174, 175, 176, 177, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 200, 202, 203, 204, 206, 209, 210, 212, 213, 217, 220,
-    221, 222, 223, 227, 228, 229, 230, 234, 235, 236, 239, 240, 241, 242, 247, 248, 249, 250, 252, 253, 254, 255, 258, 259, 260, 261, 262,
-    9, 10, 11, 12, 13, 31, 38, 39, 40, 41, 53, 54, 55, 56, 63, 64, 69, 75, 76, 77, 85, 87, 88, 89, 90, 91, 92, 93, 129, 130, 131, 138, 139,
-    140, 141, 145, 148, 150, 151, 152, 157, 169, 172, 178, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 201, 205, 207, 211, 214, 215,
-    216, 218, 219, 224, 225, 226, 231, 232, 233, 237, 238, 243, 244, 245, 246, 251, 256, 257, 263 };
-
 static void SuicideMenu() 
 {
 #ifdef GTASA
@@ -95,8 +88,14 @@ static void BombMenu()
 
         // https://library.sannybuilder.com/#/sa/default/018C
         // These might work: https://sampwiki.blast.hk/wiki/SoundID
-        //Command<Commands::ADD_ONE_OFF_SOUND>(playerPos.x, playerPos.y, playerPos.z, 1159);
-        Command<Commands::ADD_ONE_OFF_SOUND>(playerPos.x, playerPos.y, playerPos.z, AudioIds::EXPLOSION_SOUND);
+        // 
+        // Working
+        //Command<Commands::ADD_ONE_OFF_SOUND>(playerPos.x, playerPos.y, playerPos.z, AudioIds::EXPLOSION_SOUND);
+        // 
+        // 
+
+        // This works like this.
+        PlayerFunctions::AddSoundOnPlayer(AudioIds::EXPLOSION_SOUND);
 
         // This does about the same as above with a bit more code.
         //CExplosion::AddExplosion(FindPlayerPed(), FindPlayerPed(), EXPLOSION_CAR, playerPos, 1000, 1, 1.0f, true);
@@ -186,8 +185,6 @@ static void ShowCoordsMenu()
         // This works!!
         // 6-14-2024 @ 2:34PM
         Util::SetMessage(std::format("X: {} Y: {} Z: {}", playerX, playerY, playerZ).c_str());
-        //Util::SetMessage("X: " + playerXChar + " Y: " + playerYChar + " Z: " + playerZChar);
-
     }
 #endif //GTASA
 }
@@ -276,44 +273,98 @@ static void GravityValuesMenu()
 #endif //GTASA
 }
 
-// This should spawn a random ped.
-#ifdef GTASA
-static void SpawnRandomPed()
+void PedTestPage::InsaneGravity()
 {
-    CPlayerPed* player = FindPlayerPed();
-    // Taken from plugin-sdk examples under PedSpawner in Main.cpp
-    // https://github.com/DK22Pac/plugin-sdk/blob/master/examples/PedSpawner/Main.cpp
-    int modelID = pedModelIds[rand() % 250]; // Random model id
-    CStreaming::RequestModel(modelID, 0); // Request the model
-    CStreaming::LoadAllRequestedModels(false); // Whatever this does.
-    CPed* ped = new CCivilianPed(CPopulation::IsFemale(modelID) ? PED_TYPE_CIVFEMALE : PED_TYPE_CIVMALE, modelID);
+    // Make game timer,
+    // Toggle gravity from Maniac to Normal
+    float maniacGravity = 0.9;
+    float normalGravity = 0.008;
 
-    // New
-    // Idk how this one works
-    //ped->m_pIntelligence
-
-    if (ped)
-    {
-        // Is this getting the offset for the coordinates?
-        ped->SetPosn(FindPlayerPed()->TransformFromObjectSpace(CVector(0.0f, 5.0f, 3.0f)));
-        ped->SetOrientation(0.0f, 0.0f, 0.0f);
-        CWorld::Add(ped);
-        ped->PositionAnyPedOutOfCollision();
-        ped->m_pIntelligence->m_TaskMgr.SetTask(new CTaskComplexWanderStandard(4, rand() % 8, true), 4, false);
+    size_t game_ms = CTimer::m_snTimeInMilliseconds;
+    static size_t interval = 0;
+    if (game_ms - interval > 10000) {
+        //
+        if (GAME_GRAVITY = normalGravity) 
+        {
+            GAME_GRAVITY = maniacGravity;
+            interval = game_ms;
+        }
     }
 }
 
+void PedTestPage::NormalGravity()
+{
+    float maniacGravity = 0.9;
+    float normalGravity = 0.008;
+
+    size_t game_ms = CTimer::m_snTimeInMilliseconds;
+    static size_t interval = 0;
+    if (game_ms - interval > 5000) {
+        //
+        if (GAME_GRAVITY = maniacGravity)
+        {
+            GAME_GRAVITY = normalGravity;
+            interval = game_ms;
+        }
+    }
+}
+
+// I couldn't get this working.
+#ifdef _TEST1
+#ifdef GTASA
+static void SpawnRandomCopPed()
+{
+    //CVehicle* cVehicle = nullptr;
+    CPlayerPed* player = FindPlayerPed();
+    // Taken from plugin-sdk examples under PedSpawner in Main.cpp
+    // https://github.com/DK22Pac/plugin-sdk/blob/master/examples/PedSpawner/Main.cpp
+    // Cop Ped
+    int copRandModelID = copModelIds[rand() % 250]; // Random model id
+    CStreaming::RequestModel(copRandModelID, 0); // Request the model
+    CStreaming::LoadAllRequestedModels(false); // Whatever this does.
+    //CPed* ped = new CCivilianPed(CPopulation::IsFemale(modelID) ? PED_TYPE_CIVFEMALE : PED_TYPE_CIVMALE, modelID);
+    //CPed* ped = new CCivilianPed(CPopulation::IsFemale(modelID) ? PED_TYPE_CIVFEMALE : PED_TYPE_CIVMALE, modelID);
+
+
+    // Vehicle
+    //CVehicle *vehicle = new CVehicle();
+    CVehicle* SpawnVehicle(unsigned int modelIndex, CVector position) 
+    {
+
+    }
+
+    // This might be fun, have the cop run over the player.
+    CCopPed* copPed = new CCopPed(copRandModelID);
+
+    //CVehicle* cVehicle = new CVehicle(MODEL_DODO);
+
+    copPed->KillPedWithCar();
+    CStreaming::SetModelIsDeletable(copRandModelID);
+ 
+}
+#endif //GTASA
+
+#endif //_TEST1
 
 static void SpawnPedMenu()
 {
     if (ImGui::Button("Spawn Ped")) {
-        SpawnRandomPed();
+        //SpawnRandomPed();
+        // Moved this into PedFunctions.
+        PedFunctions::SpawnRandomPed();
     }
+
+#ifdef _TEST1
+    if (ImGui::Button("Spawn Random Cop ped")) 
+    {
+        SpawnRandomCopPed();
+    }
+#endif //_TEST1
     
 
 }
 
-#endif //GTASA
+//#endif //GTASA
 
 
 
@@ -369,6 +420,70 @@ static void MiscTestMenu()
         }
     }
 #endif //GTASA
+
+    if(ImGui::Button("Is player under car?"))
+    {
+        if (PlayerFunctions::IsPedStuckUnderCar()) {
+            Util::SetMessage("You are being crushed!");
+        } 
+        else
+        {
+            Util::SetMessage("You are not under a car.");
+        }
+    }
+
+    if (ImGui::Button("Add blip for current pos")) 
+    {
+        CVector playerPos = player->GetPosition();
+
+        // This works
+        //bool pos = Command<Commands::ADD_SPRITE_BLIP_FOR_COORD>(playerPos.x, playerPos.y, playerPos.z);
+        // https://library.sannybuilder.com/#/sa/default/02A8
+        // https://gtamods.com/wiki/Blip
+
+        Command<Commands::ADD_SPRITE_BLIP_FOR_COORD>(playerPos.x, playerPos.y, playerPos.z, RADAR_SPRITE_AMMUGUN);
+
+
+        // Test, didn't work
+        //CSprite playerSprite = Command<Commands::ADD_SPRITE_BLIP_FOR_COORD>(playerPos.x, playerPos.y, playerPos.z, RADAR_SPRITE_AMMUGUN);
+
+        // This doesn't seem to store the value or remove the blip.
+        //bool blip = Command<Commands::ADD_SPRITE_BLIP_FOR_COORD>(playerPos.x, playerPos.y, playerPos.z, RADAR_SPRITE_AMMUGUN);
+        //bool doesBlipExist = Command<Commands::DOES_BLIP_EXIST>(blip);
+        ////if (blipPos) 
+        //if (doesBlipExist) 
+        //{
+        //    Command<Commands::REMOVE_BLIP>(blip);
+        //    Util::SetMessage("Removed current blip.");
+        //}
+
+    }
+
+    if (ImGui::Button("Add blip for vehicle"))
+    {
+        CVehicle* pVeh = nullptr;
+        
+
+        if (PlayerFunctions::IsPlayerInVehicle()) {
+            pVeh = player->m_pVehicle;
+            Command<Commands::ADD_BLIP_FOR_CAR>(pVeh);
+            Util::SetMessage("You have added a blip for your vehicle.");
+        }
+
+    }
+
+    // I'm not sure how to remove these yet.
+    if (ImGui::Button("Remove blip for vehicle"))
+    {
+        CVehicle* pVeh = nullptr;
+
+        if (PlayerFunctions::IsPlayerInVehicle()) {
+            pVeh = player->m_pVehicle;
+            Command<Commands::REMOVE_BLIP>(pVeh);
+            Util::SetMessage("You have removed a blip for your vehicle.");
+        }
+    }
+
 #endif //_TEST1
 
 }
@@ -439,6 +554,113 @@ static void SetRespawnMiddleOfMapMenu()
 }
 
 
+// Use Swat rope test, this is in the reversed gta sa project, I wonder if I can use it in the plugin-sdk?
+// I don't know if it'll work with the player.
+static void CreateSwatRopeOnPed()
+{
+#ifdef GTASA
+    CPlayerPed* player = FindPlayerPed();
+    int hplayer = CPools::GetPedRef(player);
+    
+    CVector playerCoords = player->GetPosition();
+
+    //CVector testLocation = CVector(2, 2, 2);
+    // Will this work?
+    CVector testLocation = playerCoords;
+    
+    // Add some distance to the x and y so they don't spawn right on the player.
+    // Z is the height, I'll leave it alone for now.
+    testLocation.x = testLocation.x + 2;
+    testLocation.y = testLocation.y + 2;
+
+    // pedType, modelId, x, y, z
+    // Ped male
+    // Sweet
+    Command<Commands::CREATE_SWAT_ROPE>(PED_TYPE_CIVMALE, 270, testLocation.x, testLocation.y, testLocation.z);
+#endif //GTASA
+}
+
+//
+
+// Untested
+/// <summary>
+/// Teleport to marker test, this seems to work but doesn't put the player on the ground.
+/// </summary>
+
+static void TeleportToMarkerTest()
+{
+    // Idk what this below is doing but its defined in teleport.cpp.
+    tRadarTrace* ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPointer(0x5838B0 + 2));
+    CPlayerPed* player = FindPlayerPed();
+    int hplayer = CPools::GetPedRef(player);
+    CVector playerPos = player->GetPosition();
+
+    //Test
+    CEntity* pPlayerEntity = FindPlayerEntity(-1);
+
+    tRadarTrace targetBlip = ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+    if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
+    {
+        Util::SetMessage(TEXT("Teleport.TargetBlipText"));
+        return;
+    }
+    
+    // I don't know how to get the location of the current marker.
+    // This should place the player on the ground.
+    // This doesn't work.
+#ifdef _TEST1
+    float ground, water;
+    CEntity* pPlayerEntity = FindPlayerEntity(-1);
+    ground = CWorld::FindGroundZFor3DCoord(playerPos.x, playerPos.y, 1000, nullptr, &pPlayerEntity) + 1.0f;
+
+    Command<Commands::GET_WATER_HEIGHT_AT_COORDS>(playerPos.x, playerPos.y, true, &water);
+    playerPos.z = ground > water ? ground : water;
+
+#endif //_TEST1
+    player->SetPosn(targetBlip.m_vecPos);
+
+}
+
+static void TeleportTestMenu()
+{
+    if (ImGui::Button("Teleport to marker"))
+    {
+        // I don't think this'll work.
+        TeleportToMarkerTest();
+    }
+}
+
+void PedTest()
+{
+    ImGui::Text("Find unsuspecting target ped");
+    if(ImGui::Button("Test #1"))
+    {
+        //CWorld::FindUnsuspectingTargetPed();
+    }
+
+    ImGui::Text("Clear peds and everything in area");
+    if (ImGui::Button("Test #2")) 
+    {
+        CPlayerPed* player = FindPlayerPed();
+        CWorld::ClearExcitingStuffFromArea(player->GetPosition(), 20, true);
+        Util::SetMessage("Killed everything in the area!");
+    }
+
+    // This didn't seem to work
+    ImGui::Text("Start a fire in your area");
+    if (ImGui::Button("Test #3"))
+    {
+        CPlayerPed* player = FindPlayerPed();
+        CEntity* playerEntity = FindPlayerEntity(-1);
+
+        CVector playerPos = player->GetPosition();
+        CWorld::SetWorldOnFire(playerPos.x, playerPos.y, playerPos.z, 20, playerEntity);
+    }
+
+}
+
+
+
 /// <summary>
 /// Main code for PlayerTestMenu
 /// </summary>
@@ -478,11 +700,15 @@ void PedTestPage::PlayerTestMenu()
     TestChangeRespawnMenu();
     SetRespawnMiddleOfMapMenu();
 
+    TeleportTestMenu();
+
 #endif //GTASA
     // I could probably set this to activate when the player goes into it and send a message saying you are in the zone.
     AreaCheckTestMenu();
 
     MiscTestMenu();
+
+    PedTest();
 #endif //TEST
     
 }

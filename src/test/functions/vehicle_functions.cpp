@@ -33,35 +33,35 @@ void VehicleFunctions::PlayerInCarMsg()
 	}
 }
 
-/// <summary>
-/// Check if the players current vehicle is in the water
-/// </summary>
-/// <returns>If the current vehicle is in water.</returns>
 bool VehicleFunctions::IsCarInWater()
 {
-#ifdef GTASA
-    CPlayerPed* player = FindPlayerPed();
-        int hplayer = CPools::GetPedRef(player);
-        CVehicle* pVeh = nullptr;
+	CPlayerPed* player = FindPlayerPed();
+	int hplayer = CPools::GetPedRef(player);
+	CVehicle* pVeh = nullptr;
 
-        // TODO Possibly Move this into a vehicle_functions file.
-        // First we check if the player is in a vehicle
-        if (PlayerFunctions::IsPlayerInVehicle()) {
-            CVehicle* pVeh = player->m_pVehicle;
-            int hVeh = CPools::GetVehicleRef(pVeh);
-            // https://library.sannybuilder.com/#/sa/default/04D8
-            bool isCarInWater = Command<Commands::IS_CAR_IN_WATER>(hVeh);
+	if (PlayerFunctions::IsPlayerInVehicle())
+	{
+		CVehicle* pVeh = player->m_pVehicle;
+		// Will this work?
+		int hVeh = CPools::GetVehicleRef(pVeh);
+		bool bIsCarInWater = Command<Commands::IS_CAR_IN_WATER>(hVeh);
 
-            // If the car is not in water
-            if (!isCarInWater)
-            {
-                return false;
-            }
-            // If the car is in water
-            else
-            {
-                return true;
-            }
-        }
-#endif //GTASA
+		if (bIsCarInWater) 
+		{
+			return true;
+			
+		}
+		else 
+		{
+			return false;		
+		}
+	}
+	else 
+	{
+		// This should make this do nothing.
+		return false;
+	}
+
+	return false;
 }
+

@@ -9,6 +9,9 @@
 #include "CClock.h"
 #include "CTimer.h"
 
+// My code
+#include "test/test_ped.h"
+
 #endif //GTASA
 
 // TODO Move Chaos mode events into its own file.
@@ -122,17 +125,16 @@ void KillPlayerInMiddleOfMap()
 }
 
 
-
+//CVehicle* cVehicle;
 // This seems to work in this class.
 //#define _CHAOS_MODE
 void TestEvents::ChaosModeEvent() 
 {
+    
 
     // Put this outside of the preprocessors here so the preprocessors don't comment it out.
     PlayerFunctions* playerFunctions = new PlayerFunctions();
-    CPlayerPed* player = FindPlayerPed();
-
-    
+    CPlayerPed* player = FindPlayerPed();    
 
     //if(PlayerFunctions::m_bRespawnMiddleOfMap)
     // This doesn't seem to toggle it on/off properly
@@ -155,17 +157,59 @@ void TestEvents::ChaosModeEvent()
     // 6-18-2024 @ 3:37AM
     // I figured out how to get timers working on here, this is running in Events::gameProcessEvent in cheatmenu.cpp
     // This does work. Copied from overlay.cpp on lines 429-432
-    size_t game_ms = CTimer::m_snTimeInMilliseconds;
-    static size_t interval = 0;
+    //size_t game_ms = CTimer::m_snTimeInMilliseconds;
+    //static size_t interval = 0;
+    
+    // Toggle the gravity values, this seems to screw with it for a couple seconds and has a fun effect.
+    PedTestPage::InsaneGravity();
+    PedTestPage::NormalGravity();
 
+
+// Crashes
+#ifdef _TEST1
+        // Try to make this blow the player up if they press the horn button 5 times.
+    //m_nHornCounter
+        // This doesn't seem to work.
+    //if(CVehicle::m_nHornCounter > 1)
+    uint hornCounter = cVehicle->m_nHornCounter;
+
+    //if(cVehicle.m_nHornCounter > 1)
+    // Will this work?
+    if(PlayerFunctions::IsPlayerInVehicle() && hornCounter > 5)
+    {
+        // This might fix the timer?
+        if (game_ms - interval > 1000) 
+        {
+            PlayerFunctions::SpawnBombOnPlayer();
+        }
+    }
+#endif //_TEST1
+
+    // Doesn't work, disabled.
+#ifdef _TEST1
+    // Spawn a bomb on the players vehicle if it is upside down every second :P
+    if (PlayerFunctions::IsPlayerInVehicle()) 
+    {
+        if (CVehicle::IsUpsideDown && game_ms - interval > 1000)
+        {
+            PlayerFunctions::SpawnBombOnPlayer();
+        }
+    }
+#endif //_TEST1
+
+    // I disabled this code to test something else.
+#ifdef _TEST1
     // Add test timer for this, this works!
     if (game_ms - interval > 1000) {
         //
         KillPlayerInVehicle();
         interval = game_ms;
     }
-    
+
     KillPlayerInMiddleOfMap();
+#endif //_TEStT1
+    
+    
 
 #endif //_CHAOS_MODE
 }
